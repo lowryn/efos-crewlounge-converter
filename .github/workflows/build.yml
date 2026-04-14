@@ -8,6 +8,7 @@ on:
 jobs:
   build:
     strategy:
+      fail-fast: false   # don't cancel Windows if macOS fails
       matrix:
         include:
           - os: macos-latest
@@ -29,7 +30,7 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           curl -fsSL -o python.pkg \
-            "https://www.python.org/ftp/python/3.11.11/python-3.11.11-macos11.pkg"
+            "https://www.python.org/ftp/python/3.11.9/python-3.11.9-macos11.pkg"
           sudo installer -pkg python.pkg -target /
           echo "/Library/Frameworks/Python.framework/Versions/3.11/bin" >> "$GITHUB_PATH"
 
