@@ -35,32 +35,38 @@ a = Analysis(
 
 pyz = PYZ(a.pure)
 
-exe = EXE(
-    pyz,
-    a.scripts,
-    a.binaries,
-    a.datas,
-    [],
-    name=APP_NAME,
-    debug=False,
-    bootloader_ignore_signals=False,
-    strip=False,
-    upx=True,
-    upx_exclude=[],
-    runtime_tmpdir=None,
-    console=False,   # no terminal window
-    disable_windowed_traceback=False,
-    target_arch="universal2",   # fat binary: Intel + Apple Silicon in one
-    codesign_identity=None,
-    entitlements_file=None,
-    # Windows icon (ignored on macOS)
-    icon=None,
-)
-
-# macOS: wrap the exe in a .app bundle
 if sys.platform == "darwin":
-    app = BUNDLE(
+    # macOS: onedir mode — binaries live inside the .app bundle permanently,
+    # no temp-directory extraction on launch → instant startup, no dock flicker.
+    exe = EXE(
+        pyz,
+        a.scripts,
+        exclude_binaries=True,      # binaries go into COLLECT, not the exe
+        name=APP_NAME,
+        debug=False,
+        bootloader_ignore_signals=False,
+        strip=False,
+        upx=True,
+        console=False,
+        disable_windowed_traceback=False,
+        target_arch="universal2",   # fat binary: Intel + Apple Silicon in one
+        codesign_identity=None,
+        entitlements_file=None,
+        icon=None,
+    )
+
+    coll = COLLECT(
         exe,
+        a.binaries,
+        a.datas,
+        strip=False,
+        upx=True,
+        upx_exclude=[],
+        name=APP_NAME,
+    )
+
+    app = BUNDLE(
+        coll,
         name=f"{APP_NAME}.app",
         icon=None,
         bundle_identifier="com.jet2.efos-crewlounge-converter",
@@ -68,4 +74,27 @@ if sys.platform == "darwin":
             "NSHighResolutionCapable": True,
             "CFBundleShortVersionString": "1.0.0",
         },
+    )
+
+else:
+    # Windows: onefile mode — single self-contained .exe
+    exe = EXE(
+        pyz,
+        a.scripts,
+        a.binaries,
+        a.datas,
+        [],
+        name=APP_NAME,
+        debug=False,
+        bootloader_ignore_signals=False,
+        strip=False,
+        upx=True,
+        upx_exclude=[],
+        runtime_tmpdir=None,
+        console=False,
+        disable_windowed_traceback=False,
+        target_arch=None,
+        codesign_identity=None,
+        entitlements_file=None,
+        icon=None,
     )
