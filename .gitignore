@@ -9,7 +9,6 @@ __pycache__/
 dist/
 build/
 .eggs/
-*.spec
 
 # Virtual environments
 .venv/
@@ -17,7 +16,7 @@ venv/
 env/
 ENV/
 
-# PyInstaller output
+# PyInstaller output (build.spec is source-controlled, not ignored)
 *.exe
 *.app
 

@@ -18,6 +18,15 @@ Built for Jet2 pilots who need to batch-populate their CrewLounge logbook with h
 
 ---
 
+## Download
+
+Pre-built binaries for macOS and Windows are available on the [Releases page](https://github.com/lowryn/efos-crewlounge-converter/releases).
+
+- **macOS**: download the `.zip`, unzip, drag to Applications. First launch: right-click → **Open** (Gatekeeper warning on unsigned apps).
+- **Windows**: download the `.zip`, unzip, run the `.exe`.
+
+---
+
 ## Running from source
 
 Requires Python 3.11+.

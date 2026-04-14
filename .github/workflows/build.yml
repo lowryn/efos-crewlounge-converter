@@ -1,0 +1,80 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - "v*"          # triggers on v1.0, v1.1, etc.
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+            artifact: "EFOS-CrewLounge-Converter.app"
+            zip_name: "EFOS-CrewLounge-Converter-macOS.zip"
+          - os: windows-latest
+            artifact: "EFOS-CrewLounge-Converter.exe"
+            zip_name: "EFOS-CrewLounge-Converter-Windows.zip"
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt pyinstaller
+
+      - name: Build with PyInstaller
+        run: pyinstaller build.spec
+
+      - name: Zip artifact (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          cd dist
+          zip -r "../${{ matrix.zip_name }}" "${{ matrix.artifact }}"
+
+      - name: Zip artifact (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          cd dist
+          Compress-Archive -Path "${{ matrix.artifact }}" -DestinationPath "../${{ matrix.zip_name }}"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.zip_name }}
+          path: ${{ matrix.zip_name }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Release ${{ github.ref_name }}"
+          body: |
+            ## Download
+
+            | Platform | File |
+            |----------|------|
+            | macOS | `EFOS-CrewLounge-Converter-macOS.zip` → unzip, drag to Applications |
+            | Windows | `EFOS-CrewLounge-Converter-Windows.zip` → unzip, run the .exe |
+
+            **macOS note:** First launch — right-click the app and choose **Open** to bypass Gatekeeper (unsigned app).
+
+            See [USER_GUIDE.md](https://github.com/${{ github.repository }}/blob/main/USER_GUIDE.md) for full usage instructions.
+          files: |
+            EFOS-CrewLounge-Converter-macOS.zip/EFOS-CrewLounge-Converter-macOS.zip
+            EFOS-CrewLounge-Converter-Windows.zip/EFOS-CrewLounge-Converter-Windows.zip
