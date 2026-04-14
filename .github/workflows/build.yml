@@ -12,7 +12,7 @@ jobs:
         include:
           - os: macos-latest
             artifact: "EFOS-CrewLounge-Converter.app"
-            zip_name: "EFOS-CrewLounge-Converter-macOS-AppleSilicon.zip"
+            zip_name: "EFOS-CrewLounge-Converter-macOS.zip"
           - os: windows-latest
             artifact: "EFOS-CrewLounge-Converter.exe"
             zip_name: "EFOS-CrewLounge-Converter-Windows.zip"
@@ -23,16 +23,29 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      # macOS: install the official python.org universal2 Python so PyInstaller
+      # produces a fat binary that runs natively on both Intel and Apple Silicon.
+      - name: Install universal2 Python (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          curl -fsSL -o python.pkg \
+            "https://www.python.org/ftp/python/3.11.11/python-3.11.11-macos11.pkg"
+          sudo installer -pkg python.pkg -target /
+          echo "/Library/Frameworks/Python.framework/Versions/3.11/bin" >> "$GITHUB_PATH"
+
+      - name: Set up Python (Windows)
+        if: runner.os == 'Windows'
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install -r requirements.txt pyinstaller
+        run: pip3.11 install -r requirements.txt pyinstaller
+        shell: bash
 
       - name: Build with PyInstaller
-        run: pyinstaller build.spec
+        run: python3.11 -m PyInstaller build.spec
+        shell: bash
 
       - name: Zip artifact (macOS)
         if: runner.os == 'macOS'
@@ -71,7 +84,7 @@ jobs:
 
             | Platform | File |
             |----------|------|
-            | macOS — Apple Silicon (M1/M2/M3/M4) | `EFOS-CrewLounge-Converter-macOS-AppleSilicon.zip` |
+            | macOS — Intel & Apple Silicon | `EFOS-CrewLounge-Converter-macOS.zip` |
             | Windows | `EFOS-CrewLounge-Converter-Windows.zip` |
 
             Unzip and drag the `.app` to Applications (macOS) or run the `.exe` (Windows).
@@ -80,5 +93,5 @@ jobs:
 
             See [USER_GUIDE.md](https://github.com/${{ github.repository }}/blob/main/USER_GUIDE.md) for full usage instructions.
           files: |
-            EFOS-CrewLounge-Converter-macOS-AppleSilicon.zip/EFOS-CrewLounge-Converter-macOS-AppleSilicon.zip
+            EFOS-CrewLounge-Converter-macOS.zip/EFOS-CrewLounge-Converter-macOS.zip
             EFOS-CrewLounge-Converter-Windows.zip/EFOS-CrewLounge-Converter-Windows.zip

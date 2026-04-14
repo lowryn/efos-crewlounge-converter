@@ -50,7 +50,7 @@ exe = EXE(
     runtime_tmpdir=None,
     console=False,   # no terminal window
     disable_windowed_traceback=False,
-    target_arch=None,
+    target_arch="universal2",   # fat binary: Intel + Apple Silicon in one
     codesign_identity=None,
     entitlements_file=None,
     # Windows icon (ignored on macOS)
