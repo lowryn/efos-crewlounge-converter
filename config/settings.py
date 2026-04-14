@@ -5,11 +5,9 @@ from config.defaults import DEFAULT_CONFIG
 
 
 def _config_path() -> Path:
-    # Store alongside the executable when frozen, otherwise in home dir
-    if getattr(__import__("sys"), "frozen", False):
-        base = Path(os.path.dirname(__import__("sys").executable))
-    else:
-        base = Path.home() / ".efos-converter"
+    # Always store in the user's home directory — writing inside a .app bundle
+    # (Contents/MacOS/) can fail silently on macOS if the app is in /Applications.
+    base = Path.home() / ".efos-converter"
     base.mkdir(parents=True, exist_ok=True)
     return base / "config.json"
 

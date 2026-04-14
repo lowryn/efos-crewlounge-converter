@@ -23,10 +23,16 @@ class App(ctk.CTk):
         self.geometry("600x680")
         self.resizable(False, False)
 
+        # Show uncaught Tkinter callback exceptions instead of silently dropping them
+        self.report_callback_exception = self._on_tk_exception
+
         self.config = settings.load()
         self._result = None
 
         self._build_ui()
+
+    def _on_tk_exception(self, exc_type, exc_value, exc_tb):
+        messagebox.showerror("Unexpected error", str(exc_value))
 
     # ------------------------------------------------------------------ #
     #  UI construction                                                     #
@@ -226,6 +232,13 @@ class App(ctk.CTk):
     # ------------------------------------------------------------------ #
 
     def _start_conversion(self):
+        try:
+            self._do_start_conversion()
+        except Exception as exc:
+            messagebox.showerror("Conversion error", str(exc))
+            self.status_var.set(f"Error: {exc}")
+
+    def _do_start_conversion(self):
         efos_path = self.efos_var.get().strip()
         gl_path = self.gl_var.get().strip()
         output_path = self.output_var.get().strip()
@@ -254,7 +267,11 @@ class App(ctk.CTk):
         user_name = self._detected_user
         self_label = "SELF" if self.name_pref_var.get() == "SELF" else user_name
 
-        self._save_config()
+        try:
+            self._save_config()
+        except Exception:
+            pass  # config save failure must never block conversion
+
         self.progress_bar.set(0)
         self.status_var.set("Converting…")
         self.skipped_btn.configure(state="disabled")
@@ -279,8 +296,9 @@ class App(ctk.CTk):
                 )
                 self.after(0, lambda: self._on_done(result))
             except Exception as exc:
-                self.after(0, lambda: messagebox.showerror("Conversion failed", str(exc)))
-                self.after(0, lambda: self.status_var.set("Error — see dialog."))
+                err_msg = str(exc)
+                self.after(0, lambda: messagebox.showerror("Conversion failed", err_msg))
+                self.after(0, lambda: self.status_var.set(f"Error: {err_msg}"))
 
         threading.Thread(target=run, daemon=True).start()
 
