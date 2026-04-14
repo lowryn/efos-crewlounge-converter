@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+*.spec
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# PyInstaller output
+*.exe
+*.app
+
+# Config (contains personal paths)
+config.json
+~/.efos-converter/
+
+# Personal flight data CSVs — keep locally, don't commit
+MySectors*.csv
+globalog_*.csv
+*.csv
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
