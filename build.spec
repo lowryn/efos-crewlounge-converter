@@ -49,7 +49,7 @@ if sys.platform == "darwin":
         upx=True,
         console=False,
         disable_windowed_traceback=False,
-        target_arch="universal2",   # fat binary: Intel + Apple Silicon in one
+        target_arch=None,
         codesign_identity=None,
         entitlements_file=None,
         icon=None,
