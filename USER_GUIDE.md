@@ -29,8 +29,9 @@ The file will be named something like `MySectors.csv`.
 2. Go to your logbook / flight records
 3. Export as **CSV**
 4. Save it alongside your EFOS file
+5. You only need Globalog data covering the change in EFOS since flight times are not recorded.
 
-The filename will look like `globalog_logbook_ls40000392_20260414_....csv`.
+The filename will look like `globalog_logbook_ls00000_20260414_....csv`.
 
 ---
 
@@ -48,6 +49,7 @@ Open the **EFOS → CrewLounge Converter** app.
 
 - If you want to convert **all flights**, leave *Process all dates* ticked
 - To convert a specific period only, untick that box and enter **From** and **To** dates in DD/MM/YYYY format
+- If you overlap dates already in your logbook you will get the flight in twice.  Be careful to limit this to flights not already existing in your logbook.
 
 ### User settings
 
@@ -81,8 +83,10 @@ Open the **EFOS → CrewLounge Converter** app.
 5. Work through the wizard steps:
    - **Step 1** — File structure verification (should say OK)
    - **Step 2** — Airfield verification (should say OK)
-   - **Step 3** — Test mode parsing — review any warnings, then click *Continue Test Mode*
-   - **Step 4** — Accept the import
+   - **Step 3** — Test mode parsing — review any warnings, then click *Continue SAVE Mode*
+   - **Step 4** — Save mode parsing
+   - **Step 5** - Review the added flights in the 'flights' page for accuracy
+   - **Step 6** - Go to **Tools → Import Old Flight Data** and accept the last import or roll back as required.
 
 > **Tip:** Run the wizard in **Test Mode** first (Steps 1–3) to check for any issues before committing the import.
 
